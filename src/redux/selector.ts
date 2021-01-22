@@ -1,14 +1,16 @@
+import { createSelector } from '@reduxjs/toolkit'
 import { Store } from './store'
-import {TodoType} from './type'
 
 export const getTodoState = (store: Store) => store.todo
 
-export const getTodoList = (store: Store) => getTodoState(store) ? getTodoState(store).ID : []
+export const getTodoList = createSelector(getTodoState, state => state.ID)
 
-// export const getTodoByID = (store: Store, id: number) => getTodoState(store) ? { id, ...getTodoState(store).todo[id] } : {}
+export const getTodoByID = (id: number) => createSelector(getTodoState, state => ({
+  id,
+  ...state.todo[id]
+}))
 
-export function getTodoByID(store: Store, id: number): Partial<TodoType> {
-  return getTodoState(store) ? { id: id, ...getTodoState(store).todo[id] } : {}
-}
-
-export const getTodos = (store: Store) => getTodoList(store).map(id => getTodoByID(store, id))
+export const getTodos = createSelector(getTodoState, getTodoList, (state, list) => list.map(id => ({
+  id,
+  ...state.todo[id]
+})))
